@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const multer = require("multer")
 
 const { getMeals, addMeal,getMeal, updateMeal, updateMealImg, deleteMeal } = require("../controllers/meal.controller")
 
