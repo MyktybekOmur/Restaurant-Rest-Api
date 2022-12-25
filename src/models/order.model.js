@@ -2,34 +2,34 @@ const mongoose = require("mongoose")
 const meal = require("./meal.model")
 
 
-const userShema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    storeName:{
-        type: String,
-        required: true,
-        trim: true
-    },
-    storeAdress:{
-        type: String,
-        required: true,
-        trim: true
-    },
-    number:{
-        type: String,
-        required: true,
-        trim: true
-    },
-    image:{
-        type: String,
-        default:null
-    }
-})
+// const userShema = new mongoose.Schema({
+//     name: {
+//         type: String,
+//         required: true,
+//         trim: true
+//     },
+//     storeName:{
+//         type: String,
+//         required: true,
+//         trim: true
+//     },
+//     storeAdress:{
+//         type: String,
+//         required: true,
+//         trim: true
+//     },
+//     number:{
+//         type: String,
+//         required: true,
+//         trim: true
+//     },
+//     image:{
+//         type: String,
+//         default:null
+//     }
+// })
 
-const user = mongoose.model("order_user", userShema).schema
+// const user = mongoose.model("order_user", userShema).schema
 
 const mealsShema = new mongoose.Schema({
     count:{
@@ -37,7 +37,9 @@ const mealsShema = new mongoose.Schema({
         required: true,
      
     },
-    ordered_meal: meal.schema
+    ordered_meal:{ type: mongoose.Schema.ObjectId,
+        ref:'meals'
+        }
 })
 const meals= mongoose.model('ordered_meal',mealsShema).schema
 
@@ -52,7 +54,11 @@ const orderShema = new mongoose.Schema({
         required: true,
        
     },
-    store:user,
+    storeId:
+        { type: mongoose.Schema.ObjectId,
+            ref:'users'
+            }
+    ,
     meals:[meals],
     order_date:{
         type:Date,

@@ -6,7 +6,7 @@ const Response = require("../utils/response");
 
 const getOrders= async (req, res) => {
     
-  const ordersList = await order.find({});
+  const ordersList = await order.find({}).populate({path: 'meals.ordered_meal', select:['name','price','image']}).populate({path: 'storeId',select:['name','email','number',,'storeName','storeAdress','image']});
   if (ordersList) {
     return new Response(ordersList, "Success get").created(res);
   } else {
@@ -14,7 +14,7 @@ const getOrders= async (req, res) => {
   }
 };
 const getOrder = async (req, res) => {
-  const getOrder = await order.findById(req.params.id);
+  const getOrder = await order.findById(req.params.id).populate({path: 'meals.ordered_meal', select:['name','price','image']}).populate({path: 'storeId',select:['name','email','number',,'storeName','storeAdress','image']});
   if (getOrder) {
     return new Response(getOrder, "Success get").created(res);
   } else {
@@ -43,11 +43,11 @@ const cencelOrder = async (req, res) => {
 };
 
 const addOrder = async (req, res) => {
-      const {storeId} = req.body;
-      console.log(req.body)
-      const sendUser = await user.findById({_id:storeId}).select('name storeName storeAdress number image')
-      console.log(sendUser)
-      const orderSave = new order({ ...req.body, store: sendUser });
+      // const {storeId} = req.body;
+      // console.log(req.body)
+      // const sendUser = await user.findById({_id:storeId}).select('name storeName storeAdress number image')
+   
+      const orderSave = new order(req.body);
 
       await orderSave
         .save()
