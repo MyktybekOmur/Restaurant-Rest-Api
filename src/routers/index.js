@@ -4,10 +4,12 @@ const router = require("express").Router()
 const auth = require("./auth.routes")
 const meals = require("./meal.routers")
 const orders = require("./orders.routes")
+const costs = require("./cost.routers")
 
 router.use(auth)
 router.use(meals)
 router.use(orders)
+router.use(costs)
 
 
 

@@ -23,8 +23,6 @@ const userShema = new mongoose.Schema({
         required: true,
         trim: true
     },
-
-
     image:{
         type: String,
         default:null
