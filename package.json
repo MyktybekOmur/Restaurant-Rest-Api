@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -23,7 +24,7 @@
     "base-api",
     "nodejs-base-api"
   ],
-  "author": "",
+  "author": "Myktybek Omurbekov",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",

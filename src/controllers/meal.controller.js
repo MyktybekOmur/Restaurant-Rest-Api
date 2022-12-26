@@ -6,12 +6,24 @@ const uploadMealImg = require("../middlewares/lib/upload");
 const fs = require("fs");
 
 const getMeals = async (req, res) => {
-  const mealsList = await meal.find({});
-  if (mealsList) {
-    return new Response(mealsList, "Success get").created(res);
-  } else {
-    throw new APIError("Not Found", 400);
+  const {status} = req.query
+  console.log(status)
+  if(status===undefined){
+    const mealsList = await meal.find({});
+    if (mealsList) {
+      return new Response(mealsList, "Success get").created(res);
+    } else {
+      throw new APIError("Not Found", 400);
+    }
+  }else{
+    const mealsList = await meal.find({status});
+    if (mealsList) {
+      return new Response(mealsList, "Success get").created(res);
+    } else {
+      throw new APIError("Not Found", 400);
+    }
   }
+ 
 };
 const getMeal = async (req, res) => {
   console.log(req.params.id);
@@ -69,6 +81,7 @@ const deleteMeal = async (req, res) => {
 };
 
 const addMeal = async (req, res) => {
+  console.log(res.body)
   uploadMealImg(req, res, async function (err) {
     if (err instanceof multer.MulterError)
       throw new APIError(
