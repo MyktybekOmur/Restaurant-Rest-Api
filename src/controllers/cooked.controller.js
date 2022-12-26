@@ -47,16 +47,27 @@ const deleteCook = async (req, res) => {
 };
 
 const addCook = async (req, res) => {
-     console.log(req.body)
-      const cookSave = new cook(req.body);
-      await cookSave
-        .save()
-        .then((data) => {
-          return new Response(data, "Kayıt Başarıyla Eklendi").created(res);
-        })
-        .catch((err) => {
-          throw new APIError("Error add !", 400);
-        });
+ 
+     const cookAdded = await cook.find({date:req.body.date})
+     if(cookAdded.length>0){
+        const cookUpdate = await cook.findByIdAndUpdate(cookAdded[0]._id, req.body);
+        if (cookUpdate) {
+            return new Response(cookUpdate, "Success get").created(res);
+          } else {
+            throw new APIError("Not Found", 400);
+          }
+     }else {
+        const cookSave = new cook(req.body);
+        await cookSave
+          .save()
+          .then((data) => {
+            return new Response(data, "Kayıt Başarıyla Eklendi").created(res);
+          })
+          .catch((err) => {
+            throw new APIError("Error add !", 400);
+          });
+     } 
+ 
 };
 
 module.exports = {

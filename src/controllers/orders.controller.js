@@ -1,6 +1,6 @@
 
 const order = require("../models/order.model");
-const user = require("../models/user.model")
+const cook = require("../models/cooked.model");
 const APIError = require("../utils/errors");
 const Response = require("../utils/response");
 
@@ -22,14 +22,46 @@ const getOrder = async (req, res) => {
   }
 };
 const updateOrder = async (req, res) => {
+ 
   const { id } = req.params;
   const body = req.body;
-  const orderUpdate = await order.findOneAndUpdate(id, body);
-  if (orderUpdate) {
-    return new Response(orderUpdate, "Success get").created(res);
-  } else {
-    throw new APIError("Not Found", 400);
+  let getOrder = await order.findById(id);
+  let cookAdded = await cook.find({date:getOrder?.order_date})
+  let check = false;
+  if(cookAdded.length>0){
+
+      cookAdded[0].sold_count = await cookAdded[0].sold_count + getOrder.total_count;
+      cookAdded[0].balance_count = await cookAdded[0].balance_count - getOrder.total_count;
+      cookAdded[0].total_price = await cookAdded[0].total_price + getOrder.total_price;
+      for (let i = 0; i < getOrder.meals.length; i++) {
+        for (let j = 0; j < cookAdded[0].meal.length; j++){
+          if(getOrder.meals[i].ordered_meal.toString()===cookAdded[0].meal[j].cooked_meal.toString()){
+     
+            cookAdded[0].meal[j].sold_count = await cookAdded[0].meal[j].sold_count + getOrder.meals[i].count;
+            cookAdded[0].meal[j].balance_count = await  cookAdded[0].meal[j].balance_count - getOrder.meals[i].count;
+          }
+        }
+        
+      }
+  
+      const cookUpdate = await cook.findByIdAndUpdate(cookAdded[0]._id, cookAdded[0] );
+      if (cookUpdate) {
+         check = true;
+        } else {
+          throw new APIError("Not Found", 400);
+        }
+    
+ 
   }
+  if(check){
+    const orderUpdate = await order.findByIdAndUpdate(id, body);
+    if (orderUpdate) {
+      return new Response(orderUpdate, "Success get").created(res);
+    } else {
+      throw new APIError("Not Found", 400);
+    }
+  }
+ 
 };
 
 const cencelOrder = async (req, res) => {
@@ -44,7 +76,7 @@ const cencelOrder = async (req, res) => {
 
 const addOrder = async (req, res) => {
       // const {storeId} = req.body;
-      // console.log(req.body)
+       console.log(req.body)
       // const sendUser = await user.findById({_id:storeId}).select('name storeName storeAdress number image')
    
       const orderSave = new order(req.body);

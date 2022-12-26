@@ -25,7 +25,7 @@ const getMeal = async (req, res) => {
 const updateMeal = async (req, res) => {
   const { id } = req.params;
   const body = req.body;
-  const mealUpdate = await meal.findOneAndUpdate(id, body);
+  const mealUpdate = await meal.findByIdAndUpdate(id, body);
   if (mealUpdate) {
     return new Response(mealUpdate, "Success get").created(res);
   } else {
