@@ -1,9 +1,6 @@
 // const mongoose = require("mongoose")
 const { MongoClient } = require('mongodb');
-const client = new MongoClient(process.env.DB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+const client = new MongoClient(process.env.DB_URL);
 // client.connect(process.env.DB_URL, {
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
