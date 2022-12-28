@@ -4,10 +4,18 @@ const APIError = require("../utils/errors");
 const Response = require("../utils/response");
 
 const getOrders = async (req, res) => {
-  const {complated=false,cenceled=false,order_date=new Date().toString()} = req.query
-  console.log(complated)
+  const {
+    complated = false,
+    cenceled = false,
+    order_date = null,
+    storeId = null,
+  } = req.query;
+
+  let query = { complated: complated, cenceled: cenceled };
+  if (order_date !== null) query.order_date = order_date;
+  if (storeId !== null) query.storeId = storeId;
   const ordersList = await order
-    .find({complated,cenceled,order_date})
+    .find(query)
     .populate({
       path: "meals.ordered_meal",
       select: ["name", "price", "image"],
@@ -62,23 +70,22 @@ const updateOrder = async (req, res) => {
   let cookAdded = await cook.find({ date: getOrder?.order_date });
   let check = false;
   if (cookAdded.length > 0) {
-    cookAdded[0].sold_count =
-      await (cookAdded[0].sold_count + getOrder.total_count);
-    cookAdded[0].balance_count =
-      await (cookAdded[0].balance_count - getOrder.total_count);
-    cookAdded[0].total_price =
-      await (cookAdded[0].total_price + getOrder.total_price);
+    cookAdded[0].sold_count = await (cookAdded[0].sold_count +
+      getOrder.total_count);
+    cookAdded[0].balance_count = await (cookAdded[0].balance_count -
+      getOrder.total_count);
+    cookAdded[0].total_price = await (cookAdded[0].total_price +
+      getOrder.total_price);
     for (let i = 0; i < getOrder.meals.length; i++) {
       for (let j = 0; j < cookAdded[0].meal.length; j++) {
         if (
           getOrder.meals[i].ordered_meal.toString() ===
           cookAdded[0].meal[j].cooked_meal.toString()
         ) {
-          cookAdded[0].meal[j].sold_count =
-            await (cookAdded[0].meal[j].sold_count + getOrder.meals[i].count);
-          cookAdded[0].meal[j].balance_count =
-            await (cookAdded[0].meal[j].balance_count -
-            getOrder.meals[i].count);
+          cookAdded[0].meal[j].sold_count = await (cookAdded[0].meal[j]
+            .sold_count + getOrder.meals[i].count);
+          cookAdded[0].meal[j].balance_count = await (cookAdded[0].meal[j]
+            .balance_count - getOrder.meals[i].count);
         }
       }
     }
@@ -118,31 +125,30 @@ const addOrder = async (req, res) => {
   const body = req.body;
   console.log(body.complated);
   let check = false;
-  if(body.complated){
+  if (body.complated) {
     let cookAdded = await cook.find({ date: body?.order_date });
-   
+
     if (cookAdded.length > 0) {
-      cookAdded[0].sold_count =
-        await (cookAdded[0].sold_count + body.total_count);
-      cookAdded[0].balance_count =
-        await (cookAdded[0].balance_count - body.total_count);
-      cookAdded[0].total_price =
-        await (cookAdded[0].total_price + body.total_price);
+      cookAdded[0].sold_count = await (cookAdded[0].sold_count +
+        body.total_count);
+      cookAdded[0].balance_count = await (cookAdded[0].balance_count -
+        body.total_count);
+      cookAdded[0].total_price = await (cookAdded[0].total_price +
+        body.total_price);
       for (let i = 0; i < body.meals.length; i++) {
         for (let j = 0; j < cookAdded[0].meal.length; j++) {
           if (
             body.meals[i].ordered_meal.toString() ===
             cookAdded[0].meal[j].cooked_meal.toString()
           ) {
-            cookAdded[0].meal[j].sold_count =
-              await (cookAdded[0].meal[j].sold_count + body.meals[i].count);
-            cookAdded[0].meal[j].balance_count =
-              await (cookAdded[0].meal[j].balance_count -
-                body.meals[i].count);
+            cookAdded[0].meal[j].sold_count = await (cookAdded[0].meal[j]
+              .sold_count + body.meals[i].count);
+            cookAdded[0].meal[j].balance_count = await (cookAdded[0].meal[j]
+              .balance_count - body.meals[i].count);
           }
         }
       }
-  
+
       const cookUpdate = await cook.findByIdAndUpdate(
         cookAdded[0]._id,
         cookAdded[0]
@@ -152,8 +158,9 @@ const addOrder = async (req, res) => {
       } else {
         throw new APIError("Not Found", 400);
       }
-  }}
-  if(check){
+    }
+  }
+  if (check || !body.complated) {
     const orderSave = new order(req.body);
     await orderSave
       .save()
@@ -164,9 +171,6 @@ const addOrder = async (req, res) => {
         throw new APIError(`Error add ! ${err}`, 400);
       });
   }
-
-
-
 };
 
 module.exports = {
